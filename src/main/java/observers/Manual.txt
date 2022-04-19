@@ -1,0 +1,9 @@
+
+The observer system is to allow easy access for classes to be notified of certain events
+
+Implement interface observer to any class and add an observer to start
+
+Use EventSystem.notify() to notify the classes of an event
+
+Inside the class being notified use the onNotify() method to recieve the event type and then execute an action in the event type is appropriate
+

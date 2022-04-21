@@ -11,47 +11,29 @@ import physics2d.components.RigidBody2D;
 import renderer.PickingTexture;
 import scenes.Scene;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class PropertiesWindow {
 
-    // Active gameobject is just the object the properties window is inspecting
+    // Active gameobject is just the object the properties window is inspecting (aka the object selected)
     private GameObject activeGameObject = null;
     private PickingTexture pickingTexture;
-
-    private float debounce = 0.2f;
+    // Create a list of gameobjects since the user can select multiple of them
+    private List<GameObject> activeGameObjects;
 
     public PropertiesWindow(PickingTexture pickingTexture) {
+        this.activeGameObjects = new ArrayList<>();
         this.pickingTexture = pickingTexture;
     }
 
-    public void update(float dt, Scene currentScene) {
-        debounce -= dt;
-
-        if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT) && debounce < 0) {
-            int x = (int) MouseListener.getScreenX();
-            int y = (int) MouseListener.getScreenY();
-            int gameObjectId = pickingTexture.readPixel(x, y);
-
-            // This code is to prevent the gizmos themselves from being able to be picked by other gizmos
-            // Since technically the gizmos are also game objects
-            // Otherwise, the gizmos will attempt to attach themselves to themselves, flying away forever
-            GameObject pickedObj = currentScene.getGameObject(gameObjectId);
-            // If the picked gameobject is not null and does not have the nonpickable component attached, make it the activegameobject
-            if (pickedObj != null && pickedObj.getComponent(NonPickable.class) == null) {
-                activeGameObject = pickedObj;
-            // If the pickedobj is null and it there is no mouse dragging, set active gameobject to null
-            } else if (pickedObj == null && !MouseListener.isDragging()) {
-                activeGameObject = null;
-            }
-
-            // Reset the debounce
-            this.debounce = 0.2f;
-        }
-    }
-
     public void imgui() {
-        if (activeGameObject != null) {
+        // Only show a property window if only one gameobject is selected and it is not null
+        if (activeGameObjects.size() == 1 && activeGameObjects.get(0) != null) {
+
+            activeGameObject = activeGameObjects.get(0);
             ImGui.begin("Properties");
 
             if (ImGui.beginPopupContextWindow("ComponentAdder")) {
@@ -80,12 +62,40 @@ public class PropertiesWindow {
         }
     }
 
+    /** Returns the active gameobject only if only one is active. Else, return null.*/
     public GameObject getActiveGameObject() {
-        return this.activeGameObject;
+        if (this.activeGameObjects.size() == 1) {
+            return this.activeGameObjects.get(0);
+        } else {
+            return null;
+        }
     }
 
-    public void setActiveGameObject(GameObject gameobject) {
-        this.activeGameObject = gameobject;
+    /** Returns the list of activeGameObjects */
+    public List<GameObject> getActiveGameObjects() {
+        return this.activeGameObjects;
     }
 
+    /** Clear the list activeGameObjects (aka deselect all) */
+    public void clearSelected() {
+        this.activeGameObjects.clear();
+    }
+
+    /** If the gameobject sent is valid, clear the list activeGameObjects,
+     *  then set the input gameobject to active. (AKA deselect all, then select input GameObject) */
+    public void setActiveGameObject(GameObject go) {
+        if (go != null) {
+            clearSelected();
+            this.activeGameObjects.add(go);
+        }
+    }
+
+    /** Add gameobject to activeGameobjects (add it to the selection0 */
+    public void addActiveGameObject(GameObject go) {
+        this.activeGameObjects.add(go);
+    }
+
+    public PickingTexture getPickingTexture() {
+        return this.pickingTexture;
+    }
 }

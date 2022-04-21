@@ -3,6 +3,8 @@ package renderer;
 
 // This class uses shaders to get the gamobject that is clicked on in the leveleditor scene
 
+import org.joml.Vector2i;
+
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL14.GL_DEPTH_COMPONENT32;
 import static org.lwjgl.opengl.GL30.*;
@@ -94,4 +96,23 @@ public class PickingTexture {
         return (int)(pixels[0])-1;
     }
 
+    /** Read a block of pixels */
+    public float[] readPixels(Vector2i start, Vector2i end) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+        glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+        // Get the size of the block of pixels
+        Vector2i size = new Vector2i(end).sub(start);
+        int numPixels = size.x * size.y;
+        float pixels[] = new float[3 * numPixels];
+        glReadPixels(start.x,start.y,size.x,size.y, GL_RGB, GL_FLOAT, pixels);
+
+        // Set indexing
+        for (int i=0; i < pixels.length; i++) {
+            pixels[i] -= 1;
+        }
+
+        return pixels;
+
+    }
 }

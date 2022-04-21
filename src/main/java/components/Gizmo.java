@@ -62,19 +62,6 @@ public class Gizmo extends Component{
     public void editorUpdate(float dt) {
         // Don't update if not using
         if (!using) {return;}
-        if (KeyListener.isKeyPressed(GLFW_KEY_LEFT_CONTROL) &&
-                KeyListener.keyBeginPress(GLFW_KEY_D)) {
-            GameObject newObj = this.activeGameObject.copy();
-            Window.getScene().addGameObjectToScene(newObj);
-            // Offset it a little so it doesn't go on top of the old gameobject
-            newObj.transform.position.add(0.1f, 0.1f);
-            return;
-        } else if (KeyListener.keyBeginPress(GLFW_KEY_DELETE)) {
-            activeGameObject.destroy();
-            this.setInactive();
-            this.propertiesWindow.setActiveGameObject(null);
-            return;
-        }
         // Get the active game object from the properties window
         this.activeGameObject = this.propertiesWindow.getActiveGameObject();
         // If it's not null set active

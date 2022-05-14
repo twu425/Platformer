@@ -20,7 +20,6 @@ public class GizmoSystem extends Component {
                 Window.getImguiLayer().getPropertiesWindow()));
         gameObject.addComponent(new ScaleGizmo(gizmos.getSprite(2),
                 Window.getImguiLayer().getPropertiesWindow()));
-
     }
 
     @Override

@@ -52,7 +52,6 @@ public class MouseListener {
         if (MouseListener.instance == null) {
             MouseListener.instance = new MouseListener();
         }
-
         return MouseListener.instance;
     }
 
@@ -61,6 +60,7 @@ public class MouseListener {
             clear();
         }
         if (get().mouseButtonDown > 0) {
+            //System.out.println("AAA3");
             get().isDragging = true;
         }
 

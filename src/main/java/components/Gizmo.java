@@ -35,6 +35,7 @@ public class Gizmo extends Component{
 
     public Gizmo(Sprite arrowSprite, PropertiesWindow propertiesWindow) {
 
+        //TODO: Gizmos showing up as text might be because of this
         this.xAxisObject = Prefabs.generateSpriteObject(arrowSprite, gizmoWidth, gizmoHeight);
         this.yAxisObject = Prefabs.generateSpriteObject(arrowSprite, gizmoWidth, gizmoHeight);
         this.xAxisSprite = this.xAxisObject.getComponent(SpriteRenderer.class);
@@ -58,6 +59,8 @@ public class Gizmo extends Component{
         this.yAxisObject.setNoSerialize();
     }
 
+
+
     @Override
     public void editorUpdate(float dt) {
         // Don't update if not using
@@ -79,15 +82,14 @@ public class Gizmo extends Component{
 
         // If the xAxis is being hovered over and the mouse is dragging and the mouse is clicking on it
         // Set xAxisActive to true and yAxisActive to false
+        //System.out.println(MouseListener.isDragging());
         if ((xAxisHot || xAxisActive) && MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
             xAxisActive = true;
             yAxisActive = false;
-        }
-        else if ((yAxisHot || yAxisActive) && MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
-            xAxisActive = false;
+        } else if ((yAxisHot || yAxisActive) && MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
             yAxisActive = true;
-        }
-        else {
+            xAxisActive = false;
+        } else {
             xAxisActive = false;
             yAxisActive = false;
         }
@@ -123,7 +125,7 @@ public class Gizmo extends Component{
     // Gets the state of hovering over the gizmos and changes the color if your mouse is ontop of it
 
     private boolean checkXHoverState() {
-        Vector2f mousePos = MouseListener.getWorld();
+        Vector2f mousePos = new Vector2f(MouseListener.getWorldX(), MouseListener.getWorldY());
         if (mousePos.x <= xAxisObject.transform.position.x + (gizmoHeight / 2.0f) &&
                 mousePos.x >= xAxisObject.transform.position.x - (gizmoWidth / 2.0f) &&
                 mousePos.y >= xAxisObject.transform.position.y - (gizmoHeight / 2.0f) &&
@@ -137,7 +139,7 @@ public class Gizmo extends Component{
     }
 
     private boolean checkYHoverState() {
-        Vector2f mousePos = MouseListener.getWorld();
+        Vector2f mousePos = new Vector2f(MouseListener.getWorldX(), MouseListener.getWorldY());
         if (mousePos.x <= yAxisObject.transform.position.x + (gizmoWidth / 2.0f) &&
                 mousePos.x >= yAxisObject.transform.position.x - (gizmoWidth / 2.0f) &&
                 mousePos.y <= yAxisObject.transform.position.y + (gizmoHeight / 2.0f) &&
@@ -149,7 +151,6 @@ public class Gizmo extends Component{
         yAxisSprite.setColor(yAxisColor);
         return false;
     }
-
 
     public void setUsing() {
         using = true;

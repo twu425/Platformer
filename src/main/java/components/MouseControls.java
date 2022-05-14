@@ -6,10 +6,14 @@ import jade.KeyListener;
 import jade.MouseListener;
 import jade.Window;
 import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.joml.Vector4f;
 import renderer.DebugDraw;
 import renderer.PickingTexture;
 import scenes.Scene;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
@@ -17,7 +21,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 /** This class allows for the drag n' drop system */
 public class MouseControls extends Component {
     GameObject holdingObject = null;
-    private float debounceTime = 0.05f;
+    private float debounceTime = 0.2f;
     private float debounce = debounceTime;
 
     // Determines if the user is box selecting
@@ -75,8 +79,8 @@ public class MouseControls extends Component {
             }
         }
         else if (!MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT) && debounce < 0) {
-            int x = (int) MouseListener.getScreenX();
-            int y = (int) MouseListener.getScreenY();
+            int x = (int)MouseListener.getScreenX();
+            int y = (int)MouseListener.getScreenY();
             int gameObjectId = pickingTexture.readPixel(x, y);
 
             // This code is to prevent the gizmos themselves from being able to be picked by other gizmos
@@ -93,11 +97,12 @@ public class MouseControls extends Component {
             // Reset the debounce
             this.debounce = 0.2f;
         }
-        // If dragging and holding down left click
-
-        else if (MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
-
+        /*
+        //TODO: This breaks when changing resolution
+        else if (MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT) && holdingObject == null) {
             if (!boxSelectSet) {
+                //System.out.println("AAAA");
+
                 Window.getImguiLayer().getPropertiesWindow().clearSelected();
                 boxSelectStart = MouseListener.getScreen();
                 boxSelectSet = true;
@@ -107,9 +112,50 @@ public class MouseControls extends Component {
             Vector2f boxSelectEndWorld = MouseListener.screenToWorld(boxSelectEnd);
             Vector2f halfSize = (new Vector2f(boxSelectEndWorld).sub(boxSelectStartWorld)).mul(0.5f);
             //System.out.println(boxSelectSet);
-            System.out.println(boxSelectEndWorld);
-            System.out.println(boxSelectStartWorld);
-            DebugDraw.addBox2D((new Vector2f(boxSelectStartWorld)).add(halfSize), new Vector2f(halfSize).mul(2.0f), 0.0f);
+            //System.out.println(boxSelectEndWorld);
+            //System.out.println(boxSelectStartWorld);
+            DebugDraw.addBox2D((new Vector2f(boxSelectStartWorld)).add(halfSize),
+                    new Vector2f(halfSize).mul(2.0f),
+                    0.0f);
+        } else if (boxSelectSet) {
+            boxSelectSet = false;
+            int screenStartX = (int) boxSelectStart.x;
+            int screenStartY = (int) boxSelectStart.y;
+            int screenEndX = (int) boxSelectEnd.x;
+            int screenEndY = (int) boxSelectEnd.y;
+            boxSelectStart.zero();
+            boxSelectEnd.zero();
+
+            if (screenEndX < screenStartX) {
+                int tmp = screenStartX;
+                screenStartX = screenEndX;
+                screenEndX = tmp;
+            }
+            if (screenEndY < screenStartY) {
+                int tmp = screenStartY;
+                screenStartY = screenEndY;
+                screenEndY = tmp;
+            }
+
+            float[] gameObjectIds = pickingTexture.readPixels(
+                    new Vector2i(screenStartX, screenStartY),
+                    new Vector2i(screenEndX, screenEndY)
+            );
+            Set<Integer> uniqueGameObjectIds = new HashSet<>();
+            for (float objId : gameObjectIds) {
+                uniqueGameObjectIds.add((int)objId);
+            }
+
+            for (Integer gameObjectId : uniqueGameObjectIds) {
+                GameObject pickedObj = Window.getScene().getGameObject(gameObjectId);
+                if (pickedObj != null && pickedObj.getComponent(NonPickable.class) == null) {
+                    Window.getImguiLayer().getPropertiesWindow().addActiveGameObject(pickedObj);
+                }
+
+
+            }
         }
+
+         */
     }
 }

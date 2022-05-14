@@ -43,7 +43,7 @@ public class KeyControls extends Component{
             }
         }
         // Delete all selected objects
-        else if (KeyListener.keyBeginPress(GLFW_KEY_DELETE)) {
+        else if (KeyListener.isKeyPressed(GLFW_KEY_DELETE)) {
             for (GameObject go : activeGameObjects) {
                 go.destroy();
             }

@@ -5,24 +5,22 @@ import jade.MouseListener;
 
 public class TranslateGizmo extends Gizmo {
 
+
     public TranslateGizmo(Sprite arrowSprite, PropertiesWindow propertiesWindow) {
         super(arrowSprite, propertiesWindow);
     }
 
     @Override
     public void editorUpdate(float dt) {
-        // Move game object
         if (activeGameObject != null) {
             if (xAxisActive && !yAxisActive) {
                 activeGameObject.transform.position.x -= MouseListener.getWorldDx();
-
-            }
-            else if (yAxisActive && !xAxisActive) {
+                //System.out.println(activeGameObject.transform.position.x);
+            } else if (yAxisActive) {
                 activeGameObject.transform.position.y -= MouseListener.getWorldDy();
-                System.out.println(activeGameObject.transform.position.y);
-                System.out.println(MouseListener.getWorldY());
             }
         }
+
         super.editorUpdate(dt);
     }
 }
